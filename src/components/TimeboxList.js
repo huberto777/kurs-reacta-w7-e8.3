@@ -25,8 +25,8 @@ class TimeboxList extends React.Component {
     TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery)
       .then((timeboxes) =>
         this.setState({
-          timeboxes: timeboxes.filter((timebox) =>
-            timebox.title.includes(this.state.searchQuery)
+          timeboxes: timeboxes.filter(({ title }) =>
+            title.includes(this.state.searchQuery)
           ),
         })
       )
@@ -82,7 +82,7 @@ class TimeboxList extends React.Component {
     return (
       <>
         <div className="Timebox">
-          <input placeholder="search" onChange={this.handleSearch} />
+          <input placeholder="search" onInput={this.handleSearch} />
         </div>
         <TimeboxCreator onCreate={this.handleCreate} />
         {this.state.loading ? "Timeboxy się ładują..." : null}
