@@ -18,8 +18,18 @@ class TimeboxList extends React.Component {
     //   .then(timeboxes => this.setState({ timeboxes }))
     //   .catch(error => this.setState({ error }))
     //   .finally(() => this.setState({ loading: false }));
-    TimeboxesAPI.getAllTimeboxes()
-      .then((timeboxes) => this.setState({ timeboxes }))
+    // TimeboxesAPI.getAllTimeboxes()
+    //   .then((timeboxes) => this.setState({ timeboxes }))
+    //   .catch((error) => this.setState({ error }))
+    //   .finally(() => this.setState({ loading: false }));
+    TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery)
+      .then((timeboxes) =>
+        this.setState({
+          timeboxes: timeboxes.filter((timebox) =>
+            timebox.title.includes(this.state.searchQuery)
+          ),
+        })
+      )
       .catch((error) => this.setState({ error }))
       .finally(() => this.setState({ loading: false }));
   }
@@ -68,7 +78,7 @@ class TimeboxList extends React.Component {
   };
 
   render() {
-    const timeboxes = TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery);
+    console.log(this.state.timeboxes);
     return (
       <>
         <div className="Timebox">
@@ -77,7 +87,7 @@ class TimeboxList extends React.Component {
         <TimeboxCreator onCreate={this.handleCreate} />
         {this.state.loading ? "Timeboxy się ładują..." : null}
         {this.state.error ? "Nie udało się załadować :(" : null}
-        {timeboxes.map((timebox, index) => (
+        {this.state.timeboxes.map((timebox, index) => (
           <Timebox
             key={timebox.id}
             title={timebox.title}
