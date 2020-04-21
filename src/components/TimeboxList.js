@@ -18,20 +18,32 @@ class TimeboxList extends React.Component {
     //   .then(timeboxes => this.setState({ timeboxes }))
     //   .catch(error => this.setState({ error }))
     //   .finally(() => this.setState({ loading: false }));
-    // TimeboxesAPI.getAllTimeboxes()
-    //   .then((timeboxes) => this.setState({ timeboxes }))
-    //   .catch((error) => this.setState({ error }))
-    //   .finally(() => this.setState({ loading: false }));
-    TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery)
-      .then((timeboxes) =>
-        this.setState({
-          timeboxes: timeboxes.filter(({ title }) =>
-            title.includes(this.state.searchQuery)
-          ),
-        })
-      )
+
+    TimeboxesAPI.getAllTimeboxes()
+      .then((timeboxes) => this.setState({ timeboxes }))
       .catch((error) => this.setState({ error }))
       .finally(() => this.setState({ loading: false }));
+
+    // TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery)
+    //   .then((timeboxes) => {
+    //     this.setState({
+    //       timeboxes,
+    //     });
+    //   })
+    //   .catch((error) => this.setState({ error }))
+    //   .finally(() => this.setState({ loading: false }));
+  }
+
+  componentDidUpdate() {
+    TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery).then(
+      (timeboxes) => {
+        this.setState({
+          timeboxes: timeboxes.filter((timebox) =>
+            timebox.title.toLowerCase().includes(this.state.searchQuery)
+          ),
+        });
+      }
+    );
   }
 
   addTimebox = (timebox) => {
@@ -78,11 +90,11 @@ class TimeboxList extends React.Component {
   };
 
   render() {
-    console.log(this.state.timeboxes);
+    // console.log(this.state.timeboxes);
     return (
       <>
         <div className="Timebox">
-          <input placeholder="search" onInput={this.handleSearch} />
+          <input placeholder="search" onChange={this.handleSearch} />
         </div>
         <TimeboxCreator onCreate={this.handleCreate} />
         {this.state.loading ? "Timeboxy się ładują..." : null}
