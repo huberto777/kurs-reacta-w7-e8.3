@@ -2,8 +2,8 @@
   "timeboxes": [
     {
       "id": 3,
-      "title": "Updated timebox",
-      "totalTimeInMinutes": 22
+      "title": "New timebox",
+      "totalTimeInMinutes": "20"
     },
     {
       "title": "Nowy tytuł",
@@ -21,8 +21,8 @@
       "id": 10
     },
     {
-      "title": "js es 6",
-      "totalTimeInMinutes": "5",
+      "title": "js es6",
+      "totalTimeInMinutes": "2",
       "id": 11
     }
   ]

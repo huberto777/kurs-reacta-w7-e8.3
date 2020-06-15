@@ -10,28 +10,15 @@ class TimeboxList extends React.Component {
     loading: true,
     error: null,
     searchQuery: "",
+    editCurrentTimebox: null,
+    editMode: false,
   };
 
   componentDidMount() {
-    // l_7.8/e_2
-    // TimeboxesAPI.createTimeboxesAPI("http://localhost:5000/timeboxes")
-    //   .then(timeboxes => this.setState({ timeboxes }))
-    //   .catch(error => this.setState({ error }))
-    //   .finally(() => this.setState({ loading: false }));
-
     TimeboxesAPI.getAllTimeboxes()
       .then((timeboxes) => this.setState({ timeboxes }))
       .catch((error) => this.setState({ error }))
       .finally(() => this.setState({ loading: false }));
-
-    // TimeboxesAPI.getTimeboxesByFullTextSearch(this.state.searchQuery)
-    //   .then((timeboxes) => {
-    //     this.setState({
-    //       timeboxes,
-    //     });
-    //   })
-    //   .catch((error) => this.setState({ error }))
-    //   .finally(() => this.setState({ loading: false }));
   }
 
   componentDidUpdate() {
@@ -54,24 +41,37 @@ class TimeboxList extends React.Component {
       })
     );
   };
-  removeTimebox = (indexToRemove) => {
-    TimeboxesAPI.removeTimebox(this.state.timeboxes[indexToRemove]).then(() =>
+  removeTimebox = (timeboxToRemove) => {
+    TimeboxesAPI.removeTimebox(timeboxToRemove).then((id) =>
       this.setState((prevState) => {
         const timeboxes = prevState.timeboxes.filter(
-          (timebox, index) => index !== indexToRemove
+          (timebox) => timebox.id !== id
         );
         return { timeboxes };
       })
     );
   };
-  updateTimebox = (id, timeboxToUpdate) => {
+  editTimebox = (timebox) => {
+    this.setState({
+      timebox,
+      editCurrentTimebox: timebox.id,
+      editMode: true,
+    });
+  };
+  cancelEdit = () => {
+    this.setState({
+      editCurrentTimebox: null,
+      editMode: false,
+    });
+  };
+  updateTimebox = (timeboxToUpdate) => {
     TimeboxesAPI.partiallyUpdateTimebox(timeboxToUpdate).then(
       (updatedTimebox) =>
         this.setState((prevState) => {
           const timeboxes = prevState.timeboxes.map((timebox) =>
-            timebox.id === id ? updatedTimebox : timebox
+            timebox.id === timeboxToUpdate.id ? updatedTimebox : timebox
           );
-          return { timeboxes };
+          return { timeboxes, editCurrentTimebox: null, editMode: false };
         })
     );
   };
@@ -91,27 +91,29 @@ class TimeboxList extends React.Component {
 
   render() {
     // console.log(this.state.timeboxes);
+    const { editCurrentTimebox, editMode } = this.state;
     return (
       <>
-        <div className="Timebox">
-          <input placeholder="search" onChange={this.handleSearch} />
+        <div className={`Timebox ${editMode ? "inactive" : ""}`}>
+          <input
+            placeholder="search"
+            onInput={this.handleSearch}
+            disabled={editMode}
+          />
         </div>
-        <TimeboxCreator onCreate={this.handleCreate} />
+        <TimeboxCreator onCreate={this.handleCreate} editMode={editMode} />
         {this.state.loading ? "Timeboxy się ładują..." : null}
         {this.state.error ? "Nie udało się załadować :(" : null}
-        {this.state.timeboxes.map((timebox, index) => (
+        {this.state.timeboxes.map((timebox) => (
           <Timebox
             key={timebox.id}
-            title={timebox.title}
-            totalTimeInMinutes={timebox.totalTimeInMinutes}
-            onDelete={() => this.removeTimebox(index)}
-            onEdit={() =>
-              this.updateTimebox(timebox.id, {
-                ...timebox,
-                title: "Updated timebox",
-                totalTimeInMinutes: 22,
-              })
-            }
+            timebox={timebox}
+            onDelete={() => this.removeTimebox(timebox)}
+            onEdit={() => this.editTimebox(timebox)}
+            onUpdate={this.updateTimebox}
+            editCurrentTimebox={editCurrentTimebox}
+            onCancel={this.cancelEdit}
+            editMode={editMode}
           />
         ))}
       </>

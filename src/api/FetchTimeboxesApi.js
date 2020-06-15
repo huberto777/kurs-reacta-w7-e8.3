@@ -43,7 +43,7 @@ const FetchTimeboxesAPI = {
   },
   removeTimebox: async function (timeboxToRemove) {
     if (!timeboxToRemove.id) {
-      throw new Error("timebox has to have an id to be updated");
+      throw new Error("timebox has to have an id to be removed");
     }
     await makeRequest(`${BASE_URL}/${timeboxToRemove.id}`, "DELETE");
   },
